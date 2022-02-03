@@ -1,7 +1,7 @@
 // Bonne Pratique : Square devient une fonction composant, car la classe ne comportait que la fonction render() en plus de son constructeur
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
+    <button className="square" localSquareOnClick={props.clicPropFromBoardClass}>
       {props.value}
     </button>
   );
