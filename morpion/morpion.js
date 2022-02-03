@@ -1,5 +1,7 @@
 // Recuperation de props dans la grille (ici les id des cases) 
 class Square extends React.Component {
+  
+  // Constructeur de Square : Comporte une valeur null par défaut
   constructor(props) {
     super(props);
     this.state = {
@@ -7,11 +9,13 @@ class Square extends React.Component {
     };
   }
   
+  // Méthode render : renvoie la description "semi html/ semi js" du composant à renvoyer à l'écran
   render() {
     return (
       <button 
         className="square" 
-        onClick={() => this.setState({value: '❌'})}
+        // Fonction récupérée depuis les props de Board (handleClick()) :
+        onClick={() => this.props.clicPropFromBoardClass()}
       >
         {this.props.value}
       </button>
@@ -20,10 +24,32 @@ class Square extends React.Component {
 }
 
 class Board extends React.Component {
-  renderSquare(i) {
-    return <Square value={i}/>;
+  
+  // Constructeur de Board : Comporte une Array de 9 éléments remplis à null par défaut
+  constructor(props) {
+    super(props);
+    this.state = {
+      squares: Array(9).fill(null),
+    };
   }
-
+  
+  // Méthode définie dans le board et mappée dans les props de Board (donc récupérable dans le composé enfant Square)
+  clicMethodDefineInBoardClass(i) {
+    const squares = this.state.squares.slice();
+    squares[i] = '❌';
+    this.setState({squares: squares});
+  }
+  
+  // Récupération des valeurs de la liste de square renvoyée par le constructeur de Board
+  renderSquare(i) {
+    return <Square 
+             value={this.state.squares[i]}
+             // Fonction appelée par Square
+             clicPropFromBoardClass={() => this.clicMethodDefineInBoardClass(i)}
+             />;
+  }
+  
+  // Méthode render : renvoie la description "semi html/ semi js" du composant à renvoyer à l'écran
   render() {
     const status = 'Next player: X';
 
