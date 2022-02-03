@@ -1,30 +1,13 @@
-// Recuperation de props dans la grille (ici les id des cases) 
-class Square extends React.Component {
-  
-  // Constructeur de Square : Comporte une valeur null par défaut
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: null,
-    };
-  }
-  
-  // Méthode render : renvoie la description "semi html/ semi js" du composant à renvoyer à l'écran
-  render() {
-    return (
-      <button 
-        className="square" 
-        // Fonction récupérée depuis les props de Board (handleClick()) :
-        onClick={() => this.props.clicPropFromBoardClass()}
-      >
-        {this.props.value}
-      </button>
-    );
-  }
+// Bonne Pratique : Square devient une fonction composant, car la classe ne comportait que la fonction render() en plus de son constructeur
+function Square(props) {
+  return (
+    <button className="square" onClick={props.onClick}>
+      {props.value}
+    </button>
+  );
 }
 
 class Board extends React.Component {
-  
   // Constructeur de Board : Comporte une Array de 9 éléments remplis à null par défaut
   constructor(props) {
     super(props);
