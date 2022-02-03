@@ -1,7 +1,7 @@
 // Bonne Pratique : Square devient une fonction composant, car la classe ne comportait que la fonction render() en plus de son constructeur
 function Square(props) {
   return (
-    <button className="square" localSquareOnClick={props.clicPropFromBoardClass}>
+    <button className="square" onClick={props.clicPropFromBoardClass}>
       {props.value}
     </button>
   );
@@ -13,28 +13,34 @@ class Board extends React.Component {
     super(props);
     this.state = {
       squares: Array(9).fill(null),
+      xIsNext: true,
     };
   }
   
   // Méthode définie dans le board et mappée dans les props de Board (donc récupérable dans le composé enfant Square)
   clicMethodDefineInBoardClass(i) {
     const squares = this.state.squares.slice();
-    squares[i] = '❌';
-    this.setState({squares: squares});
+    squares[i] = this.state.xIsNext ? '❌' : '⭕';
+    this.setState({
+      squares: squares,
+      xIsNext: !this.state.xIsNext,
+    });
   }
   
   // Récupération des valeurs de la liste de square renvoyée par le constructeur de Board
   renderSquare(i) {
-    return <Square 
+    return (
+      <Square 
              value={this.state.squares[i]}
              // Fonction appelée par Square
              clicPropFromBoardClass={() => this.clicMethodDefineInBoardClass(i)}
-             />;
+             />
+      );
   }
   
   // Méthode render : renvoie la description "semi html/ semi js" du composant à renvoyer à l'écran
   render() {
-    const status = 'Next player: X';
+    const status = 'Prochain joueur : ' + (this.state.xIsNext ? '❌' : '⭕');
 
     return (
       <div>
