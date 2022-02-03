@@ -20,6 +20,10 @@ class Board extends React.Component {
   // Méthode définie dans le board et mappée dans les props de Board (donc récupérable dans le composé enfant Square)
   clicMethodDefineInBoardClass(i) {
     const squares = this.state.squares.slice();
+    // La première partie de la clause met fin au jeu lorsque l'un des cas du tableau de calculateWinner est rempli, l'autre em^pêche de jouer 2 fois sur la même case
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
     squares[i] = this.state.xIsNext ? '❌' : '⭕';
     this.setState({
       squares: squares,
@@ -40,8 +44,13 @@ class Board extends React.Component {
   
   // Méthode render : renvoie la description "semi html/ semi js" du composant à renvoyer à l'écran
   render() {
-    const status = 'Prochain joueur : ' + (this.state.xIsNext ? '❌' : '⭕');
-
+    const winner = calculateWinner(this.state.squares);
+    let status;
+    if (winner) {
+      status = winner + ' a gagné';
+    } else {
+      status = 'Prochain joueur : ' + (this.state.xIsNext ? '❌' : '⭕');
+    }
     return (
       <div>
         <div className="status">{status}</div>
@@ -87,3 +96,24 @@ ReactDOM.render(
   <Game />,
   document.getElementById('root')
 );
+
+function calculateWinner(squares) {
+  // Tableau de cas de victoire : 
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
