@@ -1,59 +1,31 @@
 // Bonne Pratique : Square devient une fonction composant, car la classe ne comportait que la fonction render() en plus de son constructeur
 function Square(props) {
   return (
-    <button className="square" onClick={props.clicPropFromBoardClass}>
+    <button className="square" 
+      onClick={props.onClick}
+    >
       {props.value}
     </button>
   );
 }
 
-class Board extends React.Component {
-  // Constructeur de Board : Comporte une Array de 9 éléments remplis à null par défaut
-  constructor(props) {
-    super(props);
-    this.state = {
-      squares: Array(9).fill(null),
-      xIsNext: true,
-    };
-  }
-  
-  // Méthode définie dans le board et mappée dans les props de Board (donc récupérable dans le composé enfant Square)
-  clicMethodDefineInBoardClass(i) {
-    const squares = this.state.squares.slice();
-    // La première partie de la clause met fin au jeu lorsque l'un des cas du tableau de calculateWinner est rempli, l'autre em^pêche de jouer 2 fois sur la même case
-    if (calculateWinner(squares) || squares[i]) {
-      return;
-    }
-    squares[i] = this.state.xIsNext ? '❌' : '⭕';
-    this.setState({
-      squares: squares,
-      xIsNext: !this.state.xIsNext,
-    });
-  }
+class Board extends React.Component {  
   
   // Récupération des valeurs de la liste de square renvoyée par le constructeur de Board
   renderSquare(i) {
     return (
       <Square 
-             value={this.state.squares[i]}
-             // Fonction appelée par Square
-             clicPropFromBoardClass={() => this.clicMethodDefineInBoardClass(i)}
-             />
+         value={this.props.squares[i]}
+         // Fonction appelée par Square
+         onClick={() => this.props.onClick(i)}
+         />
       );
   }
   
   // Méthode render : renvoie la description "semi html/ semi js" du composant à renvoyer à l'écran
   render() {
-    const winner = calculateWinner(this.state.squares);
-    let status;
-    if (winner) {
-      status = winner + ' a gagné';
-    } else {
-      status = 'Prochain joueur : ' + (this.state.xIsNext ? '❌' : '⭕');
-    }
     return (
       <div>
-        <div className="status">{status}</div>
         <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
@@ -75,14 +47,56 @@ class Board extends React.Component {
 }
 
 class Game extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      history: [{
+        squares: Array(9).fill(null),
+      }],
+      xIsNext: true,
+    };
+  }
+  
+  // Méthode définie dans le board et mappée dans les props de Board (donc récupérable dans le composé enfant Square)
+  handleClick(i) {
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const squares = current.squares.slice();
+    // La première partie de la clause met fin au jeu lorsque l'un des cas du tableau de calculateWinner est rempli, l'autre em^pêche de jouer 2 fois sur la même case
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
+    squares[i] = this.state.xIsNext ? '❌' : '⭕';
+    this.setState({
+      history: history.concat([{
+        squares: squares,
+      }]),
+      xIsNext: !this.state.xIsNext,
+    });
+  }
+  
   render() {
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const winner = calculateWinner(current.squares);
+    
+    let status;
+    if (winner) {
+      status = winner + ' a gagné';
+    } else {
+      status = 'Prochain joueur : ' + (this.state.xIsNext ? '❌' : '⭕');
+    }
+
     return (
       <div className="game">
         <div className="game-board">
-          <Board />
+          <Board
+            squares={current.squares}
+            onClick={(i) => this.handleClick(i)}
+          />
         </div>
         <div className="game-info">
-          <div>{/* status */}</div>
+          <div>{status}</div>
           <ol>{/* TODO */}</ol>
         </div>
       </div>
